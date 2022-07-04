@@ -87,12 +87,17 @@ public class Scheduler {
 	/**
 	 * Shut down the scheduler
 	 */
-	public void shutdown(){
-		executor.shutdown();
-		repeater.shutdown();
+	public static void shutdown() {
+		if (instance == null) {
+			return;
+		}
+
+		System.out.println("Shutting down thread pool...");
+		instance.executor.shutdown();
+		instance.repeater.shutdown();
 		try {
-			executor.awaitTermination(5, TimeUnit.SECONDS);
-			repeater.awaitTermination(5, TimeUnit.SECONDS);
+			instance.executor.awaitTermination(5, TimeUnit.SECONDS);
+			instance.repeater.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (InterruptedException ignored) {}
 	}
 
@@ -105,4 +110,5 @@ public class Scheduler {
 	public ScheduledFuture<?> runTaskAsynchronouslyLater(final Runnable run, final int delay){
 		return repeater.schedule(run, delay, TimeUnit.MILLISECONDS);
 	}
+
 }

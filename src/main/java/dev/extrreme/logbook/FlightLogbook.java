@@ -30,6 +30,11 @@ public class FlightLogbook {
         window = new Window();
     }
 
+    public static void close() {
+        Scheduler.shutdown();
+        System.exit(0);
+    }
+
     private static boolean initWorkingDir() {
         workingDir = new File(FileUtility.USER_APPDATA + "FlightLogbook" + FileUtility.SEPARATOR);
         return workingDir.exists() || workingDir.mkdirs();

@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+import dev.extrreme.logbook.FlightLogbook;
 import dev.extrreme.logbook.manager.AircraftManager;
 import dev.extrreme.logbook.manager.FlightManager;
 import dev.extrreme.logbook.dto.Aircraft;
@@ -16,6 +17,8 @@ import dev.extrreme.logbook.utils.StringUtility;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -469,7 +472,14 @@ public class Window extends JFrame {
         setContentPane(mainPanel);
 
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                Window.this.dispose();
+                FlightLogbook.close();
+            }
+        });
 
         setVisible(true);
     }
