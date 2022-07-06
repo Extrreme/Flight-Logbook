@@ -3,11 +3,12 @@ package dev.extrreme.logbook.utils;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ImageUtility {
 
+    private ImageUtility() {}
     /**
      * Gets an image from an image file in the resources directory
      * @param path the relative filepath of the image file from the resources directory
@@ -15,8 +16,12 @@ public class ImageUtility {
      */
     public static BufferedImage getImage(String path) {
         BufferedImage image = null;
+        InputStream is = ImageUtility.class.getResourceAsStream("/"+path);
+        if (is == null) {
+            return null;
+        }
         try {
-            image = ImageIO.read(new FileInputStream("src/main/resources/" + path));
+            image = ImageIO.read(is);
         } catch (IOException e){
             e.printStackTrace();
         }
