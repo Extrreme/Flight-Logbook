@@ -6,16 +6,15 @@ import dev.extrreme.logbook.scheduling.Scheduler;
 import dev.extrreme.logbook.utils.FileUtility;
 import dev.extrreme.logbook.sql.SQL;
 import dev.extrreme.logbook.sql.SQLite;
-import dev.extrreme.logbook.ui.Window;
+import dev.extrreme.logbook.ui.LogbookViewer;
 
 import java.io.File;
-import java.util.List;
 
 public class FlightLogbook {
     private static File workingDir;
 
     private static SQL sql;
-    private static Window window;
+    private static LogbookViewer window;
 
     public static void main(String[] args) {
         if (!initWorkingDir() || !initSQL()) {
@@ -28,7 +27,7 @@ public class FlightLogbook {
             return;
         }
 
-        window = new Window();
+        window = new LogbookViewer();
     }
 
     public static void close() {
@@ -50,7 +49,7 @@ public class FlightLogbook {
         return sql;
     }
 
-    public static Window getWindow() {
+    public static LogbookViewer getWindow() {
         return window;
     }
 }

@@ -12,7 +12,6 @@ import dev.extrreme.logbook.dto.Airframe;
 import dev.extrreme.logbook.dto.Flight;
 import dev.extrreme.logbook.ui.table.AircraftsTableModel;
 import dev.extrreme.logbook.ui.table.FlightsTableModel;
-import dev.extrreme.logbook.utils.DurationUtility;
 import dev.extrreme.logbook.utils.ImageUtility;
 import dev.extrreme.logbook.utils.StringUtility;
 
@@ -24,10 +23,9 @@ import java.awt.image.BufferedImage;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
-import java.util.EventObject;
 import java.util.UUID;
 
-public class Window extends JFrame {
+public class LogbookViewer extends JFrame {
 
     // Title to be used as window title
     private static final String TITLE = "My Logbook";
@@ -63,7 +61,7 @@ public class Window extends JFrame {
     private String selectedAircraft = null;
     private UUID selectedFlight = null;
 
-    public Window() {
+    public LogbookViewer() {
         initUI();
         initButtons();
         start();
@@ -76,7 +74,7 @@ public class Window extends JFrame {
     private void initUI() {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
-        } catch( Exception ex ) {
+        } catch (Exception ex) {
             System.err.println( "Failed to initialize LaF" );
         }
 
@@ -558,7 +556,7 @@ public class Window extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                Window.this.dispose();
+                LogbookViewer.this.dispose();
                 FlightLogbook.close();
             }
         });
