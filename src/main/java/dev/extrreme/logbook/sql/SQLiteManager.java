@@ -348,9 +348,20 @@ public class SQLiteManager implements SQLManager {
 	 */
 	@Override @NotNull
 	public synchronized List<Map<Object, Object>> getRowsInTable(String tableName, String keyColumn, String keyValue, String... columns) {
+		return getRowsInTable(tableName, keyColumn, keyValue, columns, null);
+	}
+
+	@Override @NotNull
+	public synchronized List<Map<Object, Object>> getRowsInTable(String tableName, String keyColumn, String keyValue, String[] columns, String extra) {
 		List<Map<Object, Object>> rows = doWhileConnected(conn -> {
-			String query = "SELECT * FROM "+tableName+" WHERE "+keyColumn+"=?;";
-			PreparedStatement placeStatement = conn.prepareStatement(query);
+			StringBuilder query = new StringBuilder("SELECT * FROM "+tableName+" WHERE "+keyColumn+"=?");
+
+			if (extra != null && !extra.trim().equals("")) {
+				query.append(" ").append(extra);
+			}
+			query.append(";");
+
+			PreparedStatement placeStatement = conn.prepareStatement(query.toString());
 			placeStatement.setString(1, keyValue);
 			ResultSet res = placeStatement.executeQuery();
 			List<Map<Object, Object>> list = new ArrayList<>();
@@ -385,9 +396,25 @@ public class SQLiteManager implements SQLManager {
 	 */
 	@Override @NotNull
 	public synchronized List<Map<Object, Object>> getAllRowsInTable(String tableName, String... columns) {
+		return getAllRowsInTable(tableName, columns, null);
+	}
+
+	/**
+	 * Gets all rows from the table
+	 *
+	 * @param tableName The table to get the rows from
+	 * @param columns The columns you want to return the values for at each row
+	 * @return A map containing the column names and their values
+	 */
+	@Override @NotNull
+	public synchronized List<Map<Object, Object>> getAllRowsInTable(String tableName, String[] columns, String extra) {
 		List<Map<Object, Object>> rows = doWhileConnected(conn -> {
-			String query = "SELECT * FROM "+tableName+";";
-			PreparedStatement placeStatement = conn.prepareStatement(query);
+			StringBuilder query = new StringBuilder("SELECT * FROM "+tableName);
+
+			if (extra != null && !extra.trim().equals("")) {
+				query.append(" ").append(extra);
+			}
+			PreparedStatement placeStatement = conn.prepareStatement(query.toString());
 			ResultSet res = placeStatement.executeQuery();
 			List<Map<Object, Object>> list = new ArrayList<>();
 
@@ -421,9 +448,27 @@ public class SQLiteManager implements SQLManager {
 	 */
 	@Override @NotNull
 	public synchronized List<Object> getColumnInTable(String tableName, String column) {
+		return getColumnInTable(tableName, column, null);
+	}
+
+	/**
+	 * Get all values of a column in a table
+	 *
+	 * @param tableName The table
+	 * @param column The column name
+	 * @return A list of the values
+	 */
+	@Override @NotNull
+	public synchronized List<Object> getColumnInTable(String tableName, String column, String extra) {
 		List<Object> columnVals = doWhileConnected(conn -> {
+			StringBuilder query = new StringBuilder("SELECT * FROM "+tableName);
+
+			if (extra != null && !extra.trim().equals("")) {
+				query.append(" ").append(extra);
+			}
+			query.append(";");
 			Statement statement = conn.createStatement();
-			ResultSet res = statement.executeQuery("SELECT * FROM "+tableName+";");
+			ResultSet res = statement.executeQuery(query.toString());
 			List<Object> list = new ArrayList<>();
 
 			while (res.next()) {
@@ -452,7 +497,7 @@ public class SQLiteManager implements SQLManager {
 	public synchronized int getRowCount(String tableName) {
 		Integer count = doWhileConnected(conn -> {
 			Statement statement = conn.createStatement();
-			ResultSet res = statement.executeQuery("SELECT * FROM "+tableName+" ORDER by rowid DESC;");
+			ResultSet res = statement.executeQuery("SELECT rowid FROM "+tableName+" ORDER by rowid DESC;");
 			return res.getInt("rowid");
 		});
 
