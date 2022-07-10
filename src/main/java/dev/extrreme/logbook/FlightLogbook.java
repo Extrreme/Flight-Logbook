@@ -9,6 +9,7 @@ import dev.extrreme.logbook.sql.SQLite;
 import dev.extrreme.logbook.ui.Window;
 
 import java.io.File;
+import java.util.List;
 
 public class FlightLogbook {
     private static File workingDir;

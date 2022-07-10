@@ -5,10 +5,12 @@ import dev.extrreme.logbook.dto.Aircraft;
 import dev.extrreme.logbook.dto.Flight;
 import dev.extrreme.logbook.scheduling.Scheduler;
 import dev.extrreme.logbook.sql.SQLManager;
+import dev.extrreme.logbook.utils.DurationUtility;
 import dev.extrreme.logbook.utils.obj.Executable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.*;
 
 public class FlightManager {
@@ -30,7 +32,7 @@ public class FlightManager {
     /**
      * Get a list of all flights from the logbook sqlite database, will block thread it is called from until sql query
      * completion
-     * @return The list of {@link Flight} data transfer objects representing found flights from the database
+     * @return the list of {@link Flight} data transfer objects representing found flights from the database
      */
     @NotNull
     public static List<Flight> getLoggedFlightsBlocking() {
@@ -41,6 +43,7 @@ public class FlightManager {
         if (rows == null || rows.isEmpty()) {
             return flights;
         }
+
         rows.forEach(row -> {
             UUID uuid;
             try {
@@ -64,11 +67,11 @@ public class FlightManager {
 
     /**
      * Get a list of all flights from the logbook sqlite database, will run in a separate, asynchronous thread
-     * @param callback The {@link Executable} to be executed with the retrieved list of {@link Flight} data transfer objects
+     * @param callback the {@link Executable} to be executed with the retrieved list of {@link Flight} data transfer objects
      * from the database
      */
     public static void getLoggedFlights(Executable<List<Flight>> callback) {
-        Scheduler.getInstance().runTaskAsynchronously(() -> {
+        runAsynchronously(() -> {
             List<Flight> flights = getLoggedFlightsBlocking();
             callback.execute(flights);
         });
@@ -77,8 +80,8 @@ public class FlightManager {
     /**
      * Get a list of all flights from the logbook sqlite database with the specified flight number, will block thread
      * it is called from until sql query completion
-     * @param flightNumber The flight number of the flights to find in database, as a string
-     * @return The list of {@link Flight} data transfer objects representing found flights from the database
+     * @param flightNumber the flight number of the flights to find in database, as a string
+     * @return the list of {@link Flight} data transfer objects representing found flights from the database
      */
     @NotNull
     public static List<Flight> getLoggedFlightsBlocking(String flightNumber) {
@@ -115,12 +118,12 @@ public class FlightManager {
     /**
      * Get a list of all logged flights from the logbook sqlite database with the specified flight number, will run in a
      * separate, asynchronous thread
-     * @param flightNumber The flight number of the logged flights to find in the database, as a string
-     * @param callback The {@link Executable} to be executed with the retrieved list of {@link Flight} data transfer
+     * @param flightNumber the flight number of the logged flights to find in the database, as a string
+     * @param callback the {@link Executable} to be executed with the retrieved list of {@link Flight} data transfer
      * objects from the database
      */
     public static void getLoggedFlights(String flightNumber, Executable<List<Flight>> callback) {
-        Scheduler.getInstance().runTaskAsynchronously(() -> {
+        runAsynchronously(() -> {
             List<Flight> flights = getLoggedFlightsBlocking(flightNumber);
             callback.execute(flights);
         });
@@ -129,8 +132,8 @@ public class FlightManager {
     /**
      * Get a logged flight from the logbook sqlite database, will block thread it is called from until sql query
      * completion
-     * @param uuid The {@link UUID uuid} of the logged flight to find in database,
-     * @return The {@link Flight} data transfer object representing the retrieved logged flight from the database
+     * @param uuid the {@link UUID uuid} of the logged flight to find in database,
+     * @return the {@link Flight} data transfer object representing the retrieved logged flight from the database
      */
     @Nullable
     public static Flight getLoggedFlightBlocking(UUID uuid) {
@@ -157,12 +160,12 @@ public class FlightManager {
 
     /**
      * Get a logged flight from the logbook sqlite database, will run in a separate, asynchronous thread
-     * @param uuid The {@link UUID uuid} of the logged flight to find in database,
-     * @param callback The {@link Executable} to be executed with the retrieved logged {@link Flight} data transfer
+     * @param uuid the {@link UUID uuid} of the logged flight to find in database,
+     * @param callback the {@link Executable} to be executed with the retrieved logged {@link Flight} data transfer
      * object from the database
      */
     public static void getLoggedFlight(UUID uuid, Executable<Flight> callback) {
-        Scheduler.getInstance().runTaskAsynchronously(() -> {
+        runAsynchronously(() -> {
             Flight flight = getLoggedFlightBlocking(uuid);
             callback.execute(flight);
         });
@@ -171,7 +174,7 @@ public class FlightManager {
     /**
      * Add a logged flight to the logbook sqlite database, will block thread it is called from until sql query
      * completion
-     * @param flight The {@link Flight} data transfer object containing all necessary data to store in the database
+     * @param flight the {@link Flight} data transfer object containing all necessary data to store in the database
      * @return TRUE if the logged flight was successfully inserted into the database, FALSE if an issue occurred during
      * insertion
      */
@@ -191,12 +194,12 @@ public class FlightManager {
 
     /**
      * Add a logged flight to the logbook sqlite database, will run in a separate, asynchronous thread
-     * @param flight The {@link Flight} data transfer object containing all necessary data to store in the database
-     * @param callback The {@link Executable} to be executed with the boolean response of whether the flight was
+     * @param flight the {@link Flight} data transfer object containing all necessary data to store in the database
+     * @param callback the {@link Executable} to be executed with the boolean response of whether the flight was
      * successfully inserted into the database, see return options of {@link #addFlightBlocking(Flight)}
      */
     public static void addFlight(Flight flight, Executable<Boolean> callback) {
-        Scheduler.getInstance().runTaskAsynchronously(() -> {
+        runAsynchronously(() -> {
             boolean res = addFlightBlocking(flight);
             callback.execute(res);
         });
@@ -205,7 +208,7 @@ public class FlightManager {
     /**
      * Remove a logged flight from the logbook sqlite database, will block thread it is called from until sql query
      * completion
-     * @param uuid The {@link UUID uuid} of the logged flight to find and delete from the database
+     * @param uuid the {@link UUID uuid} of the logged flight to find and delete from the database
      * @return TRUE if the logged flight was successfully removed from the database, FALSE if an issue occurred during
      * deletion
      */
@@ -215,18 +218,129 @@ public class FlightManager {
 
     /**
      * Remove a logged flight from the logbook sqlite database, will run in a separate, asynchronous thread
-     * @param uuid The {@link UUID uuid} of the logged flight to find and delete from the database
-     * @param callback The {@link Executable} to be executed with the boolean response of whether the logged flight was
+     * @param uuid the {@link UUID uuid} of the logged flight to find and delete from the database
+     * @param callback the {@link Executable} to be executed with the boolean response of whether the logged flight was
      * successfully removed from the database, see return options of {@link #removeFlightBlocking(UUID)}
      */
     public static void removeFlight(UUID uuid, Executable<Boolean> callback) {
-        Scheduler.getInstance().runTaskAsynchronously(() -> {
+        runAsynchronously(() -> {
             boolean res = removeFlightBlocking(uuid);
             callback.execute(res);
         });
     }
 
+    /**
+     * Get the total logged flight time across all flights, will block thread it is called from until sql query
+     * completion
+     * @return the total logged flight time as a {@link Duration}
+     */
+    @NotNull
+    public static Duration getTotalFlightTimeBlocking() {
+        List<Duration> durations = getLoggedFlightsBlocking().stream()
+                .map(Flight::getFlightTime)
+                .toList();
+        return DurationUtility.sum(durations);
+    }
+
+    /**
+     * Get the total logged flight time across all logged flights from the logbook sqlite database, will run in a
+     * separate, asynchronous thread
+     * @param callback the {@link Executable} to be executed with the total logged flight time as a {@link Duration}
+     */
+    public static void getTotalFlightTime(Executable<Duration> callback) {
+        runAsynchronously(() ->
+                callback.execute(getTotalFlightTimeBlocking()));
+    }
+
+    /**
+     * Get the longest logged flight from the logbook sqlite database, will block thread it is called from until sql
+     * query completion
+     * @return the {@link Flight} data transfer object representing the retrieved logged flight from the database
+     */
+    public static Flight getLongestFlightBlocking() {
+        List<Flight> flights = getLoggedFlightsBlocking();
+
+        if (flights.isEmpty()) {
+            return null;
+        }
+
+        flights.sort((lhs, rhs) ->
+                DurationUtility.compare(lhs.getFlightTime(), rhs.getFlightTime()));
+
+        return flights.get(0);
+    }
+
+    /**
+     * Get the longest logged flight from the logbook sqlite database, will block thread it is called from until sql
+     * query completion
+     * @param callback the {@link Executable} to be executed with the retrieved logged {@link Flight} data transfer
+     * object from the database
+     */
+    public static void getLongestFlight(Executable<Flight> callback) {
+        runAsynchronously(() ->
+                callback.execute(getLongestFlightBlocking()));
+    }
+
+    /**
+     * Get the total number of logged flights
+     * @return the total number of logged flights, as an integer
+     */
+    public static int getTotalNumberOfFlightsBlocking() {
+        return getSQLManager().getRowCount(FLIGHTS_TABLE);
+    }
+
+    /**
+     * Get the total number of logged flights, will block thread it is called from until sql query completion
+     * @param callback the {@link Executable} to be executed with the total number of logged flights
+     */
+    public static void getTotalNumberOfFlights(Executable<Integer> callback) {
+        runAsynchronously(() ->
+                callback.execute(getTotalNumberOfFlightsBlocking()));
+    }
+
+    /**
+     * Get the most frequent departure airport
+     * @return the most frequent departure airport, as a string
+     */
+    public static String getMostFrequentDepartureBlocking() {
+        List<Object> deps = getSQLManager().getColumnInTable(FlightManager.FLIGHTS_TABLE, FlightManager.FLIGHTS_TABLE_COLUMNS[2],
+                "GROUP BY `dep` ORDER BY COUNT(`dep`) DESC");
+
+        return deps.isEmpty() ? null : (String) deps.get(0);
+    }
+
+    /**
+     * Get the most frequent departure airport
+     * @param callback the {@link Executable} to be executed with the most frequent departure airport, as a string
+     */
+    public static void getMostFrequentDeparture(Executable<String> callback) {
+        runAsynchronously(() -> callback.execute(getMostFrequentDepartureBlocking()));
+    }
+
+    /**
+     * Get the most frequent arrival airport
+     * @return the most frequent arrival airport, as a string
+     */
+    public static String getMostFrequentArrivalBlocking() {
+        List<Object> arrs = getSQLManager().getColumnInTable(FlightManager.FLIGHTS_TABLE, FlightManager.FLIGHTS_TABLE_COLUMNS[3],
+                "GROUP BY `arr` ORDER BY COUNT(`arr`) DESC");
+
+        return arrs.isEmpty() ? null : (String) arrs.get(0);
+    }
+
+    /**
+     * Get the most frequent arrival airport
+     * @param callback the {@link Executable} to be executed with the most frequent arrival airport, as a string
+     */
+    public static void getMostFrequentArrival(Executable<String> callback) {
+        runAsynchronously(() -> callback.execute(getMostFrequentArrivalBlocking()));
+    }
+
     private static SQLManager getSQLManager() {
         return FlightLogbook.getSQL().getManager();
+    }
+    
+    private static void runAsynchronously(Runnable runnable) {
+        Scheduler.getInstance().runTaskAsynchronously(runnable);
     }
 }

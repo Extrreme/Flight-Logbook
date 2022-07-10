@@ -3,12 +3,15 @@ package dev.extrreme.logbook.manager;
 import dev.extrreme.logbook.FlightLogbook;
 import dev.extrreme.logbook.dto.Aircraft;
 import dev.extrreme.logbook.dto.Airframe;
+import dev.extrreme.logbook.dto.Flight;
 import dev.extrreme.logbook.scheduling.Scheduler;
 import dev.extrreme.logbook.sql.SQLManager;
+import dev.extrreme.logbook.utils.DurationUtility;
 import dev.extrreme.logbook.utils.obj.Executable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.*;
 
 public class AircraftManager {
@@ -148,6 +151,54 @@ public class AircraftManager {
         Scheduler.getInstance().runTaskAsynchronously(() -> 
                 callback.execute(removeAircraftBlocking(registration)));
     }
+
+    /**
+     * Get the total logged flight time of an aircraft from the logbook sqlite database, will block thread it is called
+     * from until sql query completion
+     * @param registration The registration of the aircraft to find in the database and get the flight ime of, as a
+     * string
+     * @return the flight time of the found aircraft, returns {@link Duration#ZERO} if the aircraft is not valid
+     */
+    @NotNull
+    public static Duration getFlightTimeBlocking(String registration) {
+        List<Duration> durations = FlightManager.getLoggedFlightsBlocking().stream()
+                .filter(flight -> flight.aircraft().registration().equals(registration))
+                .map(Flight::getFlightTime)
+                .toList();
+
+        return DurationUtility.sum(durations);
+    }
+
+    /**
+     * Get the total logged flight time of an aircraft from the logbook sqlite database, will block thread it is called
+     * from until sql query completion
+     * @param registration The registration of the aircraft to find in the database and get the flight ime of, as a
+     * string
+     * @param callback The {@link Executable} to be executed with the flight time of the found aircraft as a
+     * {@link Duration}, see return options of {@link #getFlightTimeBlocking(String)}
+     */
+    public static void getFlightTime(String registration, Executable<Duration> callback) {
+        Scheduler.getInstance().runTaskAsynchronously(() ->
+                callback.execute(getFlightTimeBlocking(registration)));
+    }
+
+
+    @Nullable
+    public static Aircraft getMostUsedAircraftBlocking() {
+        TreeMap<Duration, Aircraft> flightTimes = new TreeMap<>();
+
+        getAllAircraftBlocking().forEach(aircraft ->
+                flightTimes.put(getFlightTimeBlocking(aircraft.registration()), aircraft));
+
+        return flightTimes.isEmpty() ? null : flightTimes.lastEntry().getValue();
+
+    }
+
+    public static void getMostUsedAircraft(Executable<Aircraft> callback) {
+        Scheduler.getInstance().runTaskAsynchronously(() ->
+                callback.execute(getMostUsedAircraftBlocking()));
+    }
+
 
     private static SQLManager getSQLManager() {
         return FlightLogbook.getSQL().getManager();
