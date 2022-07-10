@@ -1,5 +1,6 @@
 package dev.extrreme.logbook.dto;
 
+import dev.extrreme.logbook.utils.DurationUtility;
 import dev.extrreme.logbook.utils.StringUtility;
 
 import java.time.*;
@@ -63,9 +64,14 @@ public record Flight(UUID uuid, String flightNumber, String departure, String ar
         return Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC);
     }
 
+    public String toSimpleString() {
+        return StringUtility.concatenate(", ", flightNumber, departure + " -> " + arrival,
+                DurationUtility.toString(getFlightTime()));
+    }
+
     @Override
     public String toString() {
-        return StringUtility.concatenate(",", flightNumber, departure + " -> " + arrival,
+        return StringUtility.concatenate(", ", flightNumber, departure + " -> " + arrival,
                 formatDate(getDepartureDate()) + "-" + formatDate(getArrivalDate()), aircraft.toString());
     }
 
