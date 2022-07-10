@@ -351,6 +351,15 @@ public class SQLiteManager implements SQLManager {
 		return getRowsInTable(tableName, keyColumn, keyValue, columns, null);
 	}
 
+	/**
+	 * Gets a row from the table, executed with the additional SQL syntax
+	 *
+	 * @param tableName The table to get the row from
+	 * @param keyColumn The SQL table's PRIMARY KEY name
+	 * @param keyValue The SQL table's PRIMARY KEY value at the desired row
+	 * @param columns The columns you want to return the values for at that row
+	 * @return A map containing the column names and their values
+	 */
 	@Override @NotNull
 	public synchronized List<Map<Object, Object>> getRowsInTable(String tableName, String keyColumn, String keyValue, String[] columns, String extra) {
 		List<Map<Object, Object>> rows = doWhileConnected(conn -> {
@@ -400,7 +409,7 @@ public class SQLiteManager implements SQLManager {
 	}
 
 	/**
-	 * Gets all rows from the table
+	 * Gets all rows from the table, executed with the additional SQL syntax
 	 *
 	 * @param tableName The table to get the rows from
 	 * @param columns The columns you want to return the values for at each row
@@ -452,7 +461,7 @@ public class SQLiteManager implements SQLManager {
 	}
 
 	/**
-	 * Get all values of a column in a table
+	 * Get all values of a column in a table, executed with the additional SQL syntax
 	 *
 	 * @param tableName The table
 	 * @param column The column name
