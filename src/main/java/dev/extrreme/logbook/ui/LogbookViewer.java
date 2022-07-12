@@ -11,11 +11,15 @@ import dev.extrreme.logbook.dto.Aircraft;
 import dev.extrreme.logbook.dto.Airframe;
 import dev.extrreme.logbook.dto.Flight;
 import dev.extrreme.logbook.ui.table.AircraftsTableModel;
+import dev.extrreme.logbook.ui.table.CenteredTableCellRenderer;
 import dev.extrreme.logbook.ui.table.FlightsTableModel;
 import dev.extrreme.logbook.utils.ImageUtility;
 import dev.extrreme.logbook.utils.StringUtility;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -116,11 +120,11 @@ public class LogbookViewer extends JFrame {
         label3.setFont(font);
         panel5.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label4 = new JLabel();
-        label4.setText("Departure");
+        label4.setText("Departure:");
         label4.setFont(font);
         panel5.add(label4, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label5 = new JLabel();
-        label5.setText("Arrival");
+        label5.setText("Arrival:");
         label5.setFont(font);
         panel5.add(label5, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         arrivalTextField = new JTextField();
@@ -223,7 +227,7 @@ public class LogbookViewer extends JFrame {
         // Stats Page
         final JPanel panel14 = new JPanel();
         panel14.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabbedPane.addTab("Stats", panel14);
+        tabbedPane.addTab("Statistics", panel14);
         final JPanel panel15 = new JPanel();
         panel15.setLayout(new GridLayoutManager(10, 4, new Insets(0, 0, 0, 0), -1, -1));
         panel14.add(panel15, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -496,23 +500,15 @@ public class LogbookViewer extends JFrame {
 
         aircraftSelectionComboBox.removeAllItems();
         AircraftManager.getAllAircraft(aircrafts -> {
-            AircraftsTableModel model = new AircraftsTableModel();
-
-            aircrafts.forEach(aircraft -> {
-                aircraftSelectionComboBox.addItem(aircraft.toString());
-                model.addAircraft(aircraft);
-            });
-
-            aircraftTable.setModel(model);
+            aircraftTable.setModel(new AircraftsTableModel(aircrafts));
+            adjustColumns(aircraftTable, WIDTH/3, WIDTH/3, WIDTH/3);
+            aircrafts.forEach(aircraft -> aircraftSelectionComboBox.addItem(aircraft.toString()));
         });
 
         FlightManager.getLoggedFlights(flights -> {
-            FlightsTableModel model = new FlightsTableModel();
-
-            Collections.reverse(flights); // Reverse so we can see most recently logged flights at top of table
-            flights.forEach(model::addFlight);
-
-            flightsTable.setModel(model);
+            Collections.reverse(flights); // Reversed so they are in order of being logged
+            flightsTable.setModel(new FlightsTableModel(flights));
+            adjustColumns(flightsTable, 100, 100, 100, 150, 150, 150);
         });
 
         FlightManager.getTotalNumberOfFlights(total -> flightCount.setText(total.toString()));
@@ -581,5 +577,19 @@ public class LogbookViewer extends JFrame {
     private void resetAircraftTextFields() {
         engineTextField.setText("");
         registrationTextField.setText("");
+    }
+
+    private static void adjustColumns(JTable table, int... widths) {
+        TableColumnModel columnModel = table.getColumnModel();
+        TableCellRenderer cellRenderer = new CenteredTableCellRenderer();
+        for (int i = 0; i < columnModel.getColumnCount(); i++) {
+            TableColumn column = columnModel.getColumn(i);
+            if (i < widths.length && i < columnModel.getColumnCount()-1) {
+                column.setMaxWidth(widths[i]);
+                column.setPreferredWidth(widths[i]);
+            }
+            column.setCellRenderer(cellRenderer);
+        }
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     }
 }

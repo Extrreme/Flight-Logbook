@@ -6,6 +6,7 @@ import dev.extrreme.logbook.utils.DurationUtility;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,6 +21,11 @@ public class AircraftsTableModel extends DefaultTableModel {
 
     public AircraftsTableModel() {
         setColumnIdentifiers(AIRCRAFT_TABLE_COLUMN_LABELS);
+    }
+
+    public AircraftsTableModel(List<Aircraft> aircrafts) {
+        setColumnIdentifiers(AIRCRAFT_TABLE_COLUMN_LABELS);
+        aircrafts.forEach(this::addAircraft);
     }
 
     /**

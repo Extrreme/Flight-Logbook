@@ -5,9 +5,7 @@ import dev.extrreme.logbook.dto.Flight;
 import dev.extrreme.logbook.utils.DurationUtility;
 
 import javax.swing.table.DefaultTableModel;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * A simple {@link DefaultTableModel} implementation with custom methods to directly add and get a {@link Flight}
@@ -22,6 +20,11 @@ public class FlightsTableModel extends DefaultTableModel {
 
     public FlightsTableModel() {
         setColumnIdentifiers(FLIGHTS_TABLE_COLUMN_LABELS);
+    }
+
+    public FlightsTableModel(List<Flight> flights) {
+        setColumnIdentifiers(FLIGHTS_TABLE_COLUMN_LABELS);
+        flights.forEach(this::addFlight);
     }
 
     /**
