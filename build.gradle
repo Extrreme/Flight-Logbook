@@ -20,6 +20,7 @@ jar {
 
 shadowJar {
     archiveFileName = "${project.name}-${project.version}.jar"
+    exclude 'dev/extrreme/uiBuilder/**'
 }
 
 dependencies {
