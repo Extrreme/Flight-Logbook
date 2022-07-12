@@ -1,10 +1,12 @@
 package dev.extrreme.logbook.ui;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import dev.extrreme.logbook.FlightLogbook;
+import dev.extrreme.logbook.config.ConfigKeys;
 import dev.extrreme.logbook.manager.AircraftManager;
 import dev.extrreme.logbook.manager.FlightManager;
 import dev.extrreme.logbook.dto.Aircraft;
@@ -21,6 +23,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -41,6 +44,10 @@ public class LogbookViewer extends JFrame {
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 700;
 
+    // LookAndFeel
+    private static final LookAndFeel lightMode = new FlatLightLaf();
+    private static final LookAndFeel darkMode = new FlatDarkLaf();
+
     // Font
     private static final Font font = new Font("Segoe UI", Font.PLAIN, 16);
 
@@ -51,6 +58,9 @@ public class LogbookViewer extends JFrame {
 
     // Dropdowns
     private JComboBox<String> airframeSelectionComboBox, aircraftSelectionComboBox;
+
+    // Checkboxes
+    private JCheckBox darkModeCheckBox;
 
     // Text Fields
     private JTextField flightNumberTextField, departureTextField, arrivalTextField, departureTimeTextField,
@@ -71,17 +81,21 @@ public class LogbookViewer extends JFrame {
         start();
     }
 
+    private void setLookAndFeel(LookAndFeel feel) {
+        try {
+            UIManager.setLookAndFeel(feel);
+            if (mainPanel != null) {
+                SwingUtilities.updateComponentTreeUI(mainPanel);
+            }
+        } catch (UnsupportedLookAndFeelException ex) {
+            System.err.println("Failed to initialize " + feel.getName() +", it might not be supported");
+        }
+    }
     /**
      * Initialize all Swing UI components
      * Method generated using IntelliJ IDEA GUI Designer
      */
     private void initUI() {
-        try {
-            UIManager.setLookAndFeel(new FlatLightLaf());
-        } catch (Exception ex) {
-            System.err.println( "Failed to initialize LaF" );
-        }
-
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -267,6 +281,26 @@ public class LogbookViewer extends JFrame {
         mostFreqArr.setFont(font);
         panel15.add(mostFreqArr, new GridConstraints(4, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 
+        // SETTINGS
+        final JPanel panel16 = new JPanel();
+        panel16.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane.addTab("Settings", panel16);
+        final JPanel panel17 = new JPanel();
+        panel17.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel16.add(panel17, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JLabel label19 = new JLabel();
+        label19.setText("<HTML><U><B>UI:</B></U></HTML>");
+        label19.setFont(font);
+        panel17.add(label19, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer17 = new Spacer();
+        panel17.add(spacer17, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        darkModeCheckBox = new JCheckBox();
+        darkModeCheckBox.setText("Dark Mode");
+        darkModeCheckBox.setFont(font);
+        panel17.add(darkModeCheckBox, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer18 = new Spacer();
+        panel16.add(spacer18, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+
         // SPACERS
         final Spacer spacer1 = new Spacer();
         panel5.add(spacer1, new GridConstraints(0, 6, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
@@ -300,6 +334,13 @@ public class LogbookViewer extends JFrame {
         panel15.add(spacer15, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final Spacer spacer16 = new Spacer();
         panel15.add(spacer16, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+
+        if (Boolean.parseBoolean(FlightLogbook.getConfig().getValue(ConfigKeys.DARK_MODE))) {
+            darkModeCheckBox.setSelected(true);
+            setLookAndFeel(darkMode);
+        } else {
+            setLookAndFeel(lightMode);
+        }
     }
 
     /**
@@ -487,6 +528,12 @@ public class LogbookViewer extends JFrame {
             removeFlightButton.setVisible(true);
         });
 
+        darkModeCheckBox.addItemListener(e -> {
+            boolean shouldBeDarkMode = e.getStateChange() == ItemEvent.SELECTED;
+
+            setLookAndFeel(shouldBeDarkMode ? darkMode : lightMode);
+            FlightLogbook.getConfig().setValue(ConfigKeys.DARK_MODE, shouldBeDarkMode+"");
+        });
     }
 
     /**
