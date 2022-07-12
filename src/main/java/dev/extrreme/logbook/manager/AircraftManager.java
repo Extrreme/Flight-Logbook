@@ -7,6 +7,7 @@ import dev.extrreme.logbook.dto.Flight;
 import dev.extrreme.logbook.scheduling.Scheduler;
 import dev.extrreme.logbook.sql.SQLManager;
 import dev.extrreme.logbook.utils.DurationUtility;
+import dev.extrreme.logbook.utils.SQLUtility;
 import dev.extrreme.logbook.utils.obj.Executable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -170,8 +171,8 @@ public class AircraftManager {
     }
 
     /**
-     * Get the total logged flight time of an aircraft from the logbook sqlite database, will block thread it is called
-     * from until sql query completion
+     * Get the total logged flight time of an aircraft from the logbook sqlite database, will run in a separate,
+     * asynchronous thread
      * @param registration The registration of the aircraft to find in the database and get the flight ime of, as a
      * string
      * @param callback The {@link Executable} to be executed with the flight time of the found aircraft as a
@@ -182,7 +183,11 @@ public class AircraftManager {
                 callback.execute(getFlightTimeBlocking(registration)));
     }
 
-
+    /**
+     * Get the most used aircraft (based on flight time) from the logbook sqlite database, will block thread it is
+     * called from until sql query completion
+     * @return The {@link Aircraft} data transfer object representing the found aircraft data in the database
+     */
     @Nullable
     public static Aircraft getMostUsedAircraftBlocking() {
         TreeMap<Duration, Aircraft> flightTimes = new TreeMap<>();
@@ -194,11 +199,23 @@ public class AircraftManager {
 
     }
 
+    /**
+     * Get the most used aircraft (based on flight time) from the logbook sqlite database, will block thread it is
+     * called from until sql query completion
+     * @param callback The {@link Executable} to be executed with the found aircraft, see return options of
+     * {@link #getMostUsedAircraftBlocking()}
+     */
     public static void getMostUsedAircraft(Executable<Aircraft> callback) {
         Scheduler.getInstance().runTaskAsynchronously(() ->
                 callback.execute(getMostUsedAircraftBlocking()));
     }
 
+    /**
+     * Export the logbook sqlite database aircraft table to a .csv file
+     */
+    public static void export() {
+        SQLUtility.writeTableToCSV(FlightLogbook.getSQL(), AIRCRAFT_TABLE);
+    }
 
     private static SQLManager getSQLManager() {
         return FlightLogbook.getSQL().getManager();

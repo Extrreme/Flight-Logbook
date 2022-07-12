@@ -6,6 +6,7 @@ import dev.extrreme.logbook.dto.Flight;
 import dev.extrreme.logbook.scheduling.Scheduler;
 import dev.extrreme.logbook.sql.SQLManager;
 import dev.extrreme.logbook.utils.DurationUtility;
+import dev.extrreme.logbook.utils.SQLUtility;
 import dev.extrreme.logbook.utils.obj.Executable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -334,6 +335,13 @@ public class FlightManager {
      */
     public static void getMostFrequentArrival(Executable<String> callback) {
         runAsynchronously(() -> callback.execute(getMostFrequentArrivalBlocking()));
+    }
+
+    /**
+     * Export the logbook sqlite database flights table to a .csv file
+     */
+    public static void export() {
+        SQLUtility.writeTableToCSV(FlightLogbook.getSQL(), FLIGHTS_TABLE);
     }
 
     private static SQLManager getSQLManager() {
