@@ -32,8 +32,6 @@ public class FlightLogbook {
         }
 
         window = new LogbookViewer();
-
-        System.out.println(config.getValue(ConfigKeys.DARK_MODE));
     }
 
     public static void close() {
