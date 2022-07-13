@@ -21,15 +21,12 @@ public class FlightLogbook {
     private static LogbookViewer window;
 
     public static void main(String[] args) {
-        if (!initWorkingDir() || !initConfig() || !initSQL()) {
+        if (!initWorkingDir() || !initConfig() || !initSQL() ||
+                !AircraftManager.init() || !FlightManager.init()) {
             return;
         }
 
         Scheduler.getInstance();
-
-        if (!AircraftManager.init() || !FlightManager.init()) {
-            return;
-        }
 
         window = new LogbookViewer();
     }

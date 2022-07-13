@@ -17,6 +17,7 @@ import dev.extrreme.logbook.ui.table.CenteredTableCellRenderer;
 import dev.extrreme.logbook.ui.table.FlightsTableModel;
 import dev.extrreme.logbook.utils.ImageUtility;
 import dev.extrreme.logbook.utils.StringUtility;
+import dev.extrreme.uiBuilder.LogbookViewerBuilder;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -91,9 +92,10 @@ public class LogbookViewer extends JFrame {
             System.err.println("Failed to initialize " + feel.getName() +", it might not be supported");
         }
     }
+
     /**
      * Initialize all Swing UI components
-     * Method generated using IntelliJ IDEA GUI Designer
+     * Method generated using {@link LogbookViewerBuilder}
      */
     private void initUI() {
         mainPanel = new JPanel();
