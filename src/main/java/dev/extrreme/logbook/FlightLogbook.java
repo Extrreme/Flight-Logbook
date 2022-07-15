@@ -39,7 +39,7 @@ public class FlightLogbook {
 
     private static boolean initWorkingDir() {
         workingDir = new File(FileUtility.USER_APPDATA + "FlightLogbook" + FileUtility.SEPARATOR);
-        return workingDir.exists() || workingDir.mkdirs();
+        return FileUtility.createIfNotExists(workingDir);
     }
 
     private static boolean initConfig() {

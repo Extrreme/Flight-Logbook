@@ -1,6 +1,5 @@
 package dev.extrreme.logbook.sql;
 
-import dev.extrreme.logbook.utils.obj.SQLExecutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -7,7 +7,7 @@ import dev.extrreme.logbook.scheduling.Scheduler;
 import dev.extrreme.logbook.sql.SQLManager;
 import dev.extrreme.logbook.utils.DurationUtility;
 import dev.extrreme.logbook.utils.SQLUtility;
-import dev.extrreme.logbook.utils.obj.Executable;
+import dev.extrreme.logbook.utils.executable.Executable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

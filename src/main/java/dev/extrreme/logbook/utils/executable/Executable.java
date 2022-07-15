@@ -1,4 +1,4 @@
-package dev.extrreme.logbook.utils.obj;
+package dev.extrreme.logbook.utils.executable;
 
 import java.util.concurrent.Callable;
 

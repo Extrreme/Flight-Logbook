@@ -1,9 +1,14 @@
 package dev.extrreme.logbook.sql;
 
+import dev.extrreme.logbook.utils.executable.ExceptionReturnExecutable;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 public interface SQLManager {
+    interface SQLExecutable<T> extends ExceptionReturnExecutable<Connection, T, SQLException> {}
 
     boolean createTable(String tableName, String[] columns, String[] types);
     boolean createTable(String tableName, String[] columns, String[] types, String extra);
