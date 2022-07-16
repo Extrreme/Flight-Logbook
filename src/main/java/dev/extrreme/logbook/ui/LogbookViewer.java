@@ -408,8 +408,9 @@ public class LogbookViewer extends JFrame {
 
             AircraftManager.removeAircraft(selectedAircraft, res -> {
                 if (res) {
-                    Dialogs.showSuccessDialog("Successfully deleted " + selectedAircraft);
+                    String sel = selectedAircraft;
                     refreshContent();
+                    Dialogs.showSuccessDialog("Successfully deleted " + sel);
                 } else {
                     Dialogs.showErrorDialog("An error occurred trying to delete " + selectedAircraft + " please try again");
                 }
@@ -515,8 +516,8 @@ public class LogbookViewer extends JFrame {
 
             FlightManager.removeFlight(selectedFlight, res -> {
                 if (res) {
-                    Dialogs.showSuccessDialog("Successfully deleted the selected flight log");
                     refreshContent();
+                    Dialogs.showSuccessDialog("Successfully deleted the selected flight log");
                 } else {
                     Dialogs.showErrorDialog("An error occurred trying to delete the selected flight log please try again");
                 }
@@ -572,7 +573,6 @@ public class LogbookViewer extends JFrame {
         FlightManager.getTotalNumberOfFlights(total -> flightCount.setText(total.toString()));
         FlightManager.getLongestFlight(longest -> longestFlight.setText(longest.toSimpleString()));
         AircraftManager.getMostUsedAircraft(mostUsed -> mostUsedAircraft.setText(mostUsed.toString()));
-
         FlightManager.getMostFrequentDeparture(freqDep -> mostFreqDep.setText(freqDep));
         FlightManager.getMostFrequentArrival(freqArr -> mostFreqArr.setText(freqArr));
     }

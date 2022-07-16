@@ -25,12 +25,13 @@ public abstract class Config {
         if (!file.exists()) {
             try {
                 IgnoredResult.ignore(file.createNewFile());
-                FileUtility.writeFile(file, writer ->
-                        properties.store(writer, COMMENTS)
-                );
             } catch (IOException e) {
-                System.out.println("An error occurred trying to write to file" + file.getAbsolutePath());
+                System.out.println("An error occurred trying to create file at " + file.getAbsolutePath());
             }
+
+            FileUtility.writeFile(file, writer ->
+                    properties.store(writer, COMMENTS)
+            );
         }
     }
 
